@@ -1,0 +1,11 @@
+Array
+(
+    [submit] => 1
+    [department] => dgo
+    [nomEc] => info1
+    [hoursCM] => 14
+    [hoursTD] => 12
+    [hoursTP] => 20
+    [date] => 2024-12-01
+    [signature] => 14ae
+)

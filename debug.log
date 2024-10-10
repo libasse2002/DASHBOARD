@@ -1,0 +1,112 @@
+[2024-10-10 02:42:20] Début du traitement de la soumission
+[2024-10-10 02:42:20] Données reçues : Array
+(
+    [submit] => 1
+    [department] => 3
+    [nomEc] => maths1
+    [hoursCM] => 14
+    [hoursTD] => 12
+    [hoursTP] => 12
+    [date] => 2024-12-01
+    [signature] => yeah
+)
+
+[2024-10-10 02:42:20] Données validées : departmentId=3, nomEc=maths1, hoursCM=14, hoursTD=12, hoursTP=12, date=2024-12-01, signature=yeah, userId=1
+[2024-10-10 02:42:21] Début du traitement de la soumission
+[2024-10-10 02:42:21] Données reçues : Array
+(
+    [submit] => 1
+    [department] => 3
+    [nomEc] => maths1
+    [hoursCM] => 14
+    [hoursTD] => 12
+    [hoursTP] => 12
+    [date] => 2024-12-01
+    [signature] => yeah
+)
+
+[2024-10-10 02:42:21] Données validées : departmentId=3, nomEc=maths1, hoursCM=14, hoursTD=12, hoursTP=12, date=2024-12-01, signature=yeah, userId=1
+[2024-10-10 02:42:53] Début du traitement de la soumission
+[2024-10-10 02:42:53] Données reçues : Array
+(
+    [submit] => 1
+    [department] => 3
+    [nomEc] => maths1
+    [hoursCM] => 12
+    [hoursTD] => 12
+    [hoursTP] => 12
+    [date] => 2024-12-01
+    [signature] => wii
+)
+
+[2024-10-10 02:42:53] Données validées : departmentId=3, nomEc=maths1, hoursCM=12, hoursTD=12, hoursTP=12, date=2024-12-01, signature=wii, userId=1
+[2024-10-10 02:42:53] Début du traitement de la soumission
+[2024-10-10 02:42:53] Données reçues : Array
+(
+    [submit] => 1
+    [department] => 3
+    [nomEc] => maths1
+    [hoursCM] => 12
+    [hoursTD] => 12
+    [hoursTP] => 12
+    [date] => 2024-12-01
+    [signature] => wii
+)
+
+[2024-10-10 02:42:53] Données validées : departmentId=3, nomEc=maths1, hoursCM=12, hoursTD=12, hoursTP=12, date=2024-12-01, signature=wii, userId=1
+[2024-10-10 02:42:53] Début du traitement de la soumission
+[2024-10-10 02:42:53] Données reçues : Array
+(
+    [submit] => 1
+    [department] => 3
+    [nomEc] => maths1
+    [hoursCM] => 12
+    [hoursTD] => 12
+    [hoursTP] => 12
+    [date] => 2024-12-01
+    [signature] => wii
+)
+
+[2024-10-10 02:42:53] Données validées : departmentId=3, nomEc=maths1, hoursCM=12, hoursTD=12, hoursTP=12, date=2024-12-01, signature=wii, userId=1
+[2024-10-10 02:42:54] Début du traitement de la soumission
+[2024-10-10 02:42:54] Données reçues : Array
+(
+    [submit] => 1
+    [department] => 3
+    [nomEc] => maths1
+    [hoursCM] => 12
+    [hoursTD] => 12
+    [hoursTP] => 12
+    [date] => 2024-12-01
+    [signature] => wii
+)
+
+[2024-10-10 02:42:54] Données validées : departmentId=3, nomEc=maths1, hoursCM=12, hoursTD=12, hoursTP=12, date=2024-12-01, signature=wii, userId=1
+[2024-10-10 02:42:54] Début du traitement de la soumission
+[2024-10-10 02:42:54] Données reçues : Array
+(
+    [submit] => 1
+    [department] => 3
+    [nomEc] => maths1
+    [hoursCM] => 12
+    [hoursTD] => 12
+    [hoursTP] => 12
+    [date] => 2024-12-01
+    [signature] => wii
+)
+
+[2024-10-10 02:42:54] Données validées : departmentId=3, nomEc=maths1, hoursCM=12, hoursTD=12, hoursTP=12, date=2024-12-01, signature=wii, userId=1
+[2024-10-10 02:42:54] Début du traitement de la soumission
+[2024-10-10 02:42:54] Données reçues : Array
+(
+    [submit] => 1
+    [department] => 3
+    [nomEc] => maths1
+    [hoursCM] => 12
+    [hoursTD] => 12
+    [hoursTP] => 12
+    [date] => 2024-12-01
+    [signature] => wii
+)
+
+[2024-10-10 02:42:54] Données validées : departmentId=3, nomEc=maths1, hoursCM=12, hoursTD=12, hoursTP=12, date=2024-12-01, signature=wii, userId=1
