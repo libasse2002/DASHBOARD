@@ -66,7 +66,7 @@ $result = mysqli_query($conn, $query);
 
         <!-- MAIN CONTENT -->
         <main>
-            <div class="head-title">
+            <div class="head-title1">
                 <h1>Fiches Validées</h1>
             </div>
 
@@ -74,15 +74,17 @@ $result = mysqli_query($conn, $query);
                 <?php while ($row = mysqli_fetch_assoc($result)) {
                     $totalTP = ($row['hours_cm'] * 2.16) + ($row['hours_td'] * 1.37);
                 ?>
-                    <div class="card">
+                    <div class="card" data-status="<?= htmlspecialchars($row['statut']); ?>">
                         <h3><?= htmlspecialchars($row['nom_ec']); ?></h3>
                         <p><strong>Département:</strong> <?= htmlspecialchars($row['departement_name']); ?></p>
                         <p><strong>Heures CM:</strong> <?= htmlspecialchars($row['hours_cm']); ?></p>
                         <p><strong>Heures TD:</strong> <?= htmlspecialchars($row['hours_td']); ?></p>
-                        <p><strong>Heures TP:</strong> <?= number_format($totalTP, 2); ?></p>
+                        <p><strong>Heures TP:</strong> <?= htmlspecialchars($row['hours_tp']); ?></p>
+                        <p><strong>Heures Totales TP:</strong> <?= number_format($totalTP, 2); ?></p>
                         <p><strong>Date:</strong> <?= htmlspecialchars($row['date']); ?></p>
                         <p><strong>Statut:</strong> <?= htmlspecialchars($row['statut']); ?></p>
                     </div>
+
                 <?php } ?>
             </div>
         </main>
@@ -97,6 +99,23 @@ const sidebar = document.getElementById('sidebar');
 menuBar.addEventListener('click', function () {
 	sidebar.classList.toggle('hide');
 })
+document.querySelectorAll('.validate-btn, .reject-btn, .modify-button').forEach(button => {
+        button.addEventListener('click', () => {
+            button.classList.add('clicked');
+            setTimeout(() => button.classList.remove('clicked'), 150);
+        });
+    });
+    document.querySelectorAll('.card').forEach(card => {
+    const status = card.getAttribute('data-status'); // Supposons que le statut soit défini dans un attribut 'data-status'
+    
+    if (status === 'validée') {
+        card.classList.add('validée');
+    } else if (status === 'en_attente') {
+        card.classList.add('en_attente');
+    } else if (status === 'refusée') {
+        card.classList.add('refusée');
+    }
+});
      </script>
 </body>
 </html>

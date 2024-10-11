@@ -34,3 +34,24 @@ CREATE TABLE fiches (
     FOREIGN KEY (utilisateur_id) REFERENCES utilisateur2(id) ON DELETE CASCADE,
     FOREIGN KEY (departement_id) REFERENCES departements(id) ON DELETE CASCADE
 );
+
+
+ajouter a ce base de données une table chef_departement qui regroupe chaque chef de departement relié par departement_id
+sachant que chaque departement est composé de 5 niveaux d'études qui sont à leur tour composés de semestres et ces derniers sont egalement composés de matiere comme ci dessus:
+departements ----> niveaux
+                      |
+                      |
+                      Licence 1 composé de semestre 1 (composé de x ec) et de semestre 2 (composé de x ec)
+                      |
+                      |
+                      Licence 2 composé de semestre 3 (composé de x ec) et de semestre 4 (composé de x ec)
+                      |
+                      |
+                      Licence 3 composé de semestre 5 (composé de x ec) et de semestre 6 (composé de x ec)
+                      |
+                      |
+                      Master 1 composé de semestre 7 (composé de x ec) et de semestre 8 (composé de x ec)
+                      |
+                      |
+                      Master 2 composé de semestre 9 (composé de x ec) et de semestre 10 (composé de x ec)
+creer les tables sachant egalement que ec est la table liée à nom_ec, mettre à jour la base de données si necessaire

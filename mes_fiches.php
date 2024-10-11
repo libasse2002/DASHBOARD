@@ -66,7 +66,7 @@ $result = mysqli_query($conn, $query);
 
         <!-- MAIN CONTENT -->
         <main>
-            <div class="head-title">
+            <div class="head-title1">
                 <h1>Mes Fiches</h1>
             </div>
 
@@ -74,15 +74,16 @@ $result = mysqli_query($conn, $query);
                 <?php while ($row = mysqli_fetch_assoc($result)) {
                     $totalTP = ($row['hours_cm'] * 2.16) + ($row['hours_td'] * 1.37);
                 ?>
-                    <div class="card">
+                    <div class="card" data-status="<?= htmlspecialchars($row['statut']); ?>">
                         <h3><?= htmlspecialchars($row['nom_ec']); ?></h3>
                         <p><strong>Département:</strong> <?= htmlspecialchars($row['departement_name']); ?></p>
                         <p><strong>Heures CM:</strong> <?= htmlspecialchars($row['hours_cm']); ?></p>
                         <p><strong>Heures TD:</strong> <?= htmlspecialchars($row['hours_td']); ?></p>
-                        <p><strong>Heures TP:</strong> <?= number_format($totalTP, 2); ?></p>
+                        <p><strong>Heures TP:</strong> <?= htmlspecialchars($row['hours_tp']); ?></p>
+                        <p><strong>Heures Totales TP:</strong> <?= number_format($totalTP, 2); ?></p>
                         <p><strong>Date:</strong> <?= htmlspecialchars($row['date']); ?></p>
                         <p><strong>Statut:</strong> <?= htmlspecialchars($row['statut']); ?></p>
-
+                        
                         <?php if ($row['statut'] == 'en_attente' || $row['statut'] == 'refusée') { ?>
                             <a href="modifier_fiche.php?id=<?= $row['id']; ?>" class="modify-button">Modifier</a>
                         <?php } ?>

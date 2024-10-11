@@ -15,17 +15,32 @@ $departements = $result->fetch_all(MYSQLI_ASSOC);
     <meta charset="UTF-8">
     <title>Nouvelle Soumission</title>
     <link rel="stylesheet" href="subm.css">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a81368914c.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    <!-- Background Wave Image -->
+    <img class="wave" src="wave3.png">
+    
     <div class="container">
-        <div class="submission-content">
-            <h2 class="title">Nouvelle Soumission</h2>
-            <form id="submissionForm">
-                <input type="hidden" name="submit" value="1"> <!-- Champ caché -->
+        <!-- Left Image (Illustration) -->
+        <div class="img">
+            <img src="bg.svg">
+        </div>
 
+        <!-- Submission Form Content -->
+        <div class="submission-content">
+            <!-- Profile Image and Title -->
+            <h2 class="title">Nouvelle Soumission</h2>
+
+            <!-- Submission Form -->
+            <form id="submissionForm">
+                <input type="hidden" name="submit" value="1"> <!-- Hidden Field -->
+
+                <!-- Department Field -->
                 <div class="input-div one">
                     <div class="i">
                         <i class="fas fa-building"></i>
@@ -41,6 +56,7 @@ $departements = $result->fetch_all(MYSQLI_ASSOC);
                     </div>
                 </div>
 
+                <!-- Course Name Field -->
                 <div class="input-div">
                     <div class="i">
                         <i class="fas fa-book"></i>
@@ -51,6 +67,7 @@ $departements = $result->fetch_all(MYSQLI_ASSOC);
                     </div>
                 </div>
 
+                <!-- Course Hours Fields -->
                 <div class="input-div">
                     <div class="i">
                         <i class="fas fa-clock"></i>
@@ -81,6 +98,7 @@ $departements = $result->fetch_all(MYSQLI_ASSOC);
                     </div>
                 </div>
 
+                <!-- Date Field -->
                 <div class="input-div">
                     <div class="i">
                         <i class="fas fa-calendar-alt"></i>
@@ -91,6 +109,7 @@ $departements = $result->fetch_all(MYSQLI_ASSOC);
                     </div>
                 </div>
 
+                <!-- Signature Field -->
                 <div class="input-div">
                     <div class="i">
                         <i class="fas fa-signature"></i>
@@ -101,67 +120,43 @@ $departements = $result->fetch_all(MYSQLI_ASSOC);
                     </div>
                 </div>
 
+                <!-- Submit Button -->
                 <button type="submit" class="btn">Soumettre</button>
             </form>
         </div>
     </div>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('submissionForm');
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('submissionForm');
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent page reload
 
-    form.addEventListener('submit', function(event) {
-        event.preventDefault(); // Empêche le rechargement de la page
+                const formData = new FormData(form);
 
-        const formData = new FormData(form);
-
-        fetch('submit.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                toastr.success(data.message);
-                form.reset(); // Réinitialise le formulaire
-                setTimeout(() => {
-                    window.location.href = 'dashboard.php'; // Redirige vers le tableau de bord après 2 secondes
-                }, 2000);
-            } else {
-                toastr.error(data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Erreur:', error);
-            toastr.error('Une erreur est survenue. Veuillez réessayer.');
+                fetch('submit.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        toastr.success(data.message);
+                        form.reset(); // Reset form
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.php'; // Redirect to dashboard after 2 seconds
+                        });
+                    } else {
+                        toastr.error(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    toastr.error('Une erreur est survenue. Veuillez réessayer.');
+                });
+            });
         });
-    });
-});
-        // const form = document.getElementById('submissionForm');
-
-        // form.addEventListener('submit', function(event) {
-        //     event.preventDefault(); // Empêche le rechargement de la page
-
-        //     const formData = new FormData(form);
-
-        //     fetch('submit.php', {
-        //         method: 'POST',
-        //         body: formData
-        //     })
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         if (data.success) {
-        //             toastr.success('Votre soumission a été enregistrée avec succès.');
-        //             form.reset(); // Réinitialise le formulaire
-        //         } else {
-        //             toastr.error('Erreur lors de l\'envoi de la soumission: ' + data.message);
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.error('Erreur:', error);
-        //         toastr.error('Une erreur est survenue. Veuillez réessayer.');
-        //     });
-        // });
     </script>
 </body>
 </html>
+

@@ -43,7 +43,8 @@ $result = mysqli_query($conn, $query);
         </ul>
     </section>
     <!-- END SIDEBAR -->
-
+    <!-- Conteneur pour les messages de confirmation -->
+    <div id="confirmation-message" style="display: none;"></div>
     <!-- CONTENT -->
     <section id="content">
         <!-- NAVBAR -->
@@ -52,7 +53,7 @@ $result = mysqli_query($conn, $query);
             <form action="#">
                 <div class="form-input">
                     <input type="search" placeholder="Recherche...">
-                    <button type="submit" class="search-btn"><i class='bx bx-search'></i></button>
+                    <button type="submit" class="search-button"><i class='bx bx-search'></i></button>
                 </div>
             </form>
             <input type="checkbox" id="switch-mode" hidden>
@@ -67,7 +68,7 @@ $result = mysqli_query($conn, $query);
 
         <!-- MAIN CONTENT -->
         <main>
-            <div class="head-title">
+            <div class="head-title1">
                 <h1>Fiches Reçues</h1>
             </div>
 
@@ -75,23 +76,24 @@ $result = mysqli_query($conn, $query);
                 <?php while ($row = mysqli_fetch_assoc($result)) {
                     $totalTP = ($row['hours_cm'] * 2.16) + ($row['hours_td'] * 1.37);
                 ?>
-                    <div class="card">
+                    <div class="card" data-status="<?= htmlspecialchars($row['statut']); ?>">
                         <h3><?= htmlspecialchars($row['nom_ec']); ?></h3>
                         <p><strong>Département:</strong> <?= htmlspecialchars($row['departement_name']); ?></p>
                         <p><strong>Heures CM:</strong> <?= htmlspecialchars($row['hours_cm']); ?></p>
                         <p><strong>Heures TD:</strong> <?= htmlspecialchars($row['hours_td']); ?></p>
-                        <p><strong>Heures TP:</strong> <?= number_format($totalTP, 2); ?></p>
+                        <p><strong>Heures TP:</strong> <?= htmlspecialchars($row['hours_tp']); ?></p>
+                        <p><strong>Heures Totales TP:</strong> <?= number_format($totalTP, 2); ?></p>
                         <p><strong>Date:</strong> <?= htmlspecialchars($row['date']); ?></p>
                         <p><strong>Statut:</strong> <?= htmlspecialchars($row['statut']); ?></p>
 
                         <div class="actions">
                             <?php if ($row['statut'] == 'en_attente') { ?>
-                                <button class="validate-btn" data-id="<?= $row['id']; ?>">Valider</button>
-                                <button class="reject-btn" data-id="<?= $row['id']; ?>">Refuser</button>
-                                <!-- <button class="modify-btn" data-id="<?= $row['id']; ?>">Modifier</button> -->
+                                <button class="validate-button" data-id="<?= $row['id']; ?>">Valider</button>
+                                <button class="reject-button" data-id="<?= $row['id']; ?>">Refuser</button>
                             <?php } ?>
                         </div>
                     </div>
+
                 <?php } ?>
             </div>
         </main>
@@ -100,31 +102,63 @@ $result = mysqli_query($conn, $query);
     <!-- END CONTENT -->
 
     <script>
+        // $(document).ready(function() {
+        //     // AJAX pour valider une fiche
+        //     $('.validate-button').on('click', function() {
+        //         let ficheId = $(this).data('id');
+        //         $.post('valider_fiche.php', { fiche_id: ficheId }, function(response) {
+        //             alert(response.message);
+        //             location.reload(); // Recharger la page après validation
+        //         }, 'json');
+        //     });
+
+        //     // AJAX pour refuser une fiche
+        //     $('.reject-button').on('click', function() {
+        //         let ficheId = $(this).data('id');
+        //         $.post('refuser_fiche.php', { fiche_id: ficheId }, function(response) {
+        //             alert(response.message);
+        //             location.reload(); // Recharger la page après refus
+        //         }, 'json');
+        //     });
+
+        //     // // Redirection pour modifier une fiche
+        //     // $('.modify-button').on('click', function() {
+        //     //     let ficheId = $(this).data('id');
+        //     //     window.location.href = 'modifier_fiche.php?id=' + ficheId;
+        //     // });
+        // });
+
         $(document).ready(function() {
-            // AJAX pour valider une fiche
-            $('.validate-btn').on('click', function() {
-                let ficheId = $(this).data('id');
-                $.post('valider_fiche.php', { fiche_id: ficheId }, function(response) {
-                    alert(response.message);
-                    location.reload(); // Recharger la page après validation
-                }, 'json');
-            });
-
-            // AJAX pour refuser une fiche
-            $('.reject-btn').on('click', function() {
-                let ficheId = $(this).data('id');
-                $.post('refuser_fiche.php', { fiche_id: ficheId }, function(response) {
-                    alert(response.message);
-                    location.reload(); // Recharger la page après refus
-                }, 'json');
-            });
-
-            // // Redirection pour modifier une fiche
-            // $('.modify-btn').on('click', function() {
-            //     let ficheId = $(this).data('id');
-            //     window.location.href = 'modifier_fiche.php?id=' + ficheId;
-            // });
+    // AJAX pour valider une fiche
+    $('.validate-button').on('click', function() {
+        let ficheId = $(this).data('id');
+        $.ajax({
+            url: 'valider_fiche.php',
+            type: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({ fiche_id: ficheId, statut: 'validée' }),
+            success: function(response) {
+                alert(response.message);
+                location.reload(); // Recharger la page après validation
+            },
+            error: function(xhr, status, error) {
+                console.error("Erreur: " + error);
+                alert("Une erreur s'est produite lors de la validation.");
+            }
         });
+    });
+
+    // AJAX pour refuser une fiche
+    $('.reject-button').on('click', function() {
+        let ficheId = $(this).data('id');
+        $.post('refuser_fiche.php', { fiche_id: ficheId }, function(response) {
+            alert(response.message);
+            location.reload(); // Recharger la page après refus
+        }, 'json');
+    });
+});
+
         // TOGGLE SIDEBAR
         const menuBar = document.querySelector('#content nav .bx.bx-menu');
         const sidebar = document.getElementById('sidebar');
@@ -132,6 +166,51 @@ $result = mysqli_query($conn, $query);
         menuBar.addEventListener('click', function () {
 	        sidebar.classList.toggle('hide');
         })
+        document.querySelectorAll('.validate-button, .reject-button, .modify-button').forEach(button => {
+        button.addEventListener('click', () => {
+            button.classList.add('clicked');
+            setTimeout(() => button.classList.remove('clicked'), 150);
+        });
+    });
+    document.querySelectorAll('.card').forEach(card => {
+    const status = card.getAttribute('data-status'); // Supposons que le statut soit défini dans un attribut 'data-status'
+    
+    if (status === 'validée') {
+        card.classList.add('validée');
+    } else if (status === 'en_attente') {
+        card.classList.add('en_attente');
+    } else if (status === 'refusée') {
+        card.classList.add('refusée');
+    }
+});
+document.addEventListener('DOMContentLoaded', function() {
+    const validateButtons = document.querySelectorAll('.validate-button');
+    const rejectButtons = document.querySelectorAll('.reject-button');
+
+    validateButtons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            const card = button.closest('.card'); // Récupérer la carte parente
+            card.style.backgroundColor = 'var(--light-green)'; // Changer le fond en light-green
+        });
+
+        button.addEventListener('mouseleave', function() {
+            const card = button.closest('.card');
+            card.style.backgroundColor = ''; // Réinitialiser à la couleur d'origine
+        });
+    });
+
+    rejectButtons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            const card = button.closest('.card'); // Récupérer la carte parente
+            card.style.backgroundColor = 'var(--light-red)'; // Changer le fond en light-red
+        });
+
+        button.addEventListener('mouseleave', function() {
+            const card = button.closest('.card');
+            card.style.backgroundColor = ''; // Réinitialiser à la couleur d'origine
+        });
+    });
+});
     </script>
 </body>
 </html>

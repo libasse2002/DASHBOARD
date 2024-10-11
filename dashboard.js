@@ -13,6 +13,17 @@ allSideMenu.forEach(item=> {
 
 
 
+document.querySelectorAll('.card').forEach(card => {
+    const status = card.getAttribute('data-status'); // Supposons que le statut soit défini dans un attribut 'data-status'
+    
+	if (status === 'validée') {
+        card.classList.add('validée');
+    } else if (status === 'en_attente') {
+        card.classList.add('en_attente');
+    } else if (status === 'refusée') {
+        card.classList.add('refusée');
+    }
+});
 
 // TOGGLE SIDEBAR
 const menuBar = document.querySelector('#content nav .bx.bx-menu');
@@ -134,4 +145,48 @@ socket.addEventListener('message', function(event) {
   if (data.type === 'new_declaration') {
     fetchRecentDeclarations(); // Met à jour les déclarations récentes immédiatement
   }
+  document.querySelectorAll('.validate-btn, .reject-btn, .modify-button').forEach(button => {
+	button.addEventListener('click', () => {
+		button.classList.add('clicked');
+		setTimeout(() => button.classList.remove('clicked'), 150);
+	});
 });
+});
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.validate-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const ficheId = button.getAttribute('data-id');
+            updateStatus(ficheId, 'validée');
+        });
+    });
+
+    document.querySelectorAll('.reject-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const ficheId = button.getAttribute('data-id');
+            updateStatus(ficheId, 'refusée');
+        });
+    });
+
+    // Fonction pour envoyer la requête AJAX de validation ou de refus
+    function updateStatus(ficheId, status) {
+        fetch('update_fiche_status.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ fiche_id: ficheId, statut: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload(); // Recharge la page pour voir les modifications
+            } else {
+                alert('Erreur: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Erreur:', error));
+    }
+});
+
+

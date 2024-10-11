@@ -51,11 +51,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <img class="wave" src="wave3.png">
     <div class="container">
         <div class="img">
-            <img src="bg.svg">
+            <img src="undraw_Calculator_re_alsc.png">
         </div>
         <div class="login-content">
             <form action="" method="post">
-                <img src="avatar.svg">
+                <img src="undraw_Pic_profile_re_7g2h.png">
                 <h2 class="title">Bienvenue</h2>
                 
                 <!-- Affichage des erreurs -->
