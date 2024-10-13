@@ -13,8 +13,15 @@ try {
     $ficheId = $data['fiche_id'] ?? null;
     $statut = $data['statut'] ?? null;
 
+    // Vérifier que les paramètres sont spécifiés
     if (!$ficheId || !$statut) {
         throw new Exception("ID de fiche ou statut non spécifié.");
+    }
+
+    // Valider le statut
+    $validStatuses = ['en_attente', 'validée', 'refusée']; // Liste des statuts valides
+    if (!in_array($statut, $validStatuses)) {
+        throw new Exception("Statut invalide spécifié.");
     }
 
     $userId = $_SESSION['user_id'];
@@ -44,6 +51,7 @@ try {
 
     $stmt->close();
 } catch (Exception $e) {
+    http_response_code(400); // Envoie un code d'état HTTP 400 pour les erreurs
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
 

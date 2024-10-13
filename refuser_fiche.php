@@ -9,11 +9,11 @@ try {
     }
 
     // Récupérer l'ID de la fiche à refuser
-    if (!isset($_POST['fiche_id'])) {
-        throw new Exception("ID de fiche non spécifié.");
+    if (!isset($_POST['fiche_id']) || !filter_var($_POST['fiche_id'], FILTER_VALIDATE_INT)) {
+        throw new Exception("ID de fiche non spécifié ou invalide.");
     }
 
-    $ficheId = $_POST['fiche_id'];
+    $ficheId = intval($_POST['fiche_id']);
     $userId = $_SESSION['user_id'];
 
     // Vérifier si la fiche existe et appartient à l'utilisateur
@@ -41,8 +41,10 @@ try {
 
     $stmt->close();
 } catch (Exception $e) {
+    http_response_code(400); // Envoie un code d'état HTTP 400 pour les erreurs
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
 
+// Fermer la connexion à la base de données
 $conn->close();
 ?>

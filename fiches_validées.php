@@ -8,9 +8,23 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Récupérer les fiches validées
-$query = "SELECT f.*, d.nom AS departement_name FROM fiches f JOIN departements d ON f.departement_id = d.id WHERE f.statut = 'validée'";
+// Récupérer l'ID de l'utilisateur
+$userId = $_SESSION['user_id'];
+
+// Requête mise à jour pour inclure le niveau, le semestre et l'EC
+$query = "
+    SELECT f.*, d.nom AS departement_name, n.nom AS niveau_name, s.nom AS semestre_name 
+    FROM fiches f 
+    JOIN departements d ON f.departement_id = d.id 
+    LEFT JOIN niveaux n ON f.niveau_id = n.id 
+    LEFT JOIN semestres s ON f.semestre_id = s.id 
+    WHERE f.statut = 'validée'
+";
 $result = mysqli_query($conn, $query);
+$fichesParDepartement = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $fichesParDepartement[$row['departement_name']][] = $row;
+}
 ?>
 
 <!DOCTYPE html>
@@ -71,12 +85,17 @@ $result = mysqli_query($conn, $query);
             </div>
 
             <div class="card-container">
-                <?php while ($row = mysqli_fetch_assoc($result)) {
+            <?php foreach ($fichesParDepartement as $departement => $fiches): ?>
+                <h2><?= htmlspecialchars($departement); ?></h2>
+                <?php foreach ($fiches as $row): // Use foreach to iterate through the fiches ?>
+                    <?php 
                     $totalTP = ($row['hours_cm'] * 2.16) + ($row['hours_td'] * 1.37);
-                ?>
+                    ?>
                     <div class="card" data-status="<?= htmlspecialchars($row['statut']); ?>">
                         <h3><?= htmlspecialchars($row['nom_ec']); ?></h3>
                         <p><strong>Département:</strong> <?= htmlspecialchars($row['departement_name']); ?></p>
+                        <p><strong>Niveau:</strong> <?= htmlspecialchars($row['niveau_name']); ?></p>
+                        <p><strong>Semestre:</strong> <?= htmlspecialchars($row['semestre_name']); ?></p>
                         <p><strong>Heures CM:</strong> <?= htmlspecialchars($row['hours_cm']); ?></p>
                         <p><strong>Heures TD:</strong> <?= htmlspecialchars($row['hours_td']); ?></p>
                         <p><strong>Heures TP:</strong> <?= htmlspecialchars($row['hours_tp']); ?></p>
@@ -84,38 +103,33 @@ $result = mysqli_query($conn, $query);
                         <p><strong>Date:</strong> <?= htmlspecialchars($row['date']); ?></p>
                         <p><strong>Statut:</strong> <?= htmlspecialchars($row['statut']); ?></p>
                     </div>
-
-                <?php } ?>
+                <?php endforeach; // End foreach for fiches ?>
+            <?php endforeach; // End foreach for departments ?>
             </div>
         </main>
         <!-- END MAIN CONTENT -->
     </section>
     <!-- END CONTENT -->
-     <script>
+    <script>
         // TOGGLE SIDEBAR
-const menuBar = document.querySelector('#content nav .bx.bx-menu');
-const sidebar = document.getElementById('sidebar');
+        const menuBar = document.querySelector('#content nav .bx.bx-menu');
+        const sidebar = document.getElementById('sidebar');
 
-menuBar.addEventListener('click', function () {
-	sidebar.classList.toggle('hide');
-})
-document.querySelectorAll('.validate-btn, .reject-btn, .modify-button').forEach(button => {
-        button.addEventListener('click', () => {
-            button.classList.add('clicked');
-            setTimeout(() => button.classList.remove('clicked'), 150);
+        menuBar.addEventListener('click', function () {
+            sidebar.classList.toggle('hide');
         });
-    });
-    document.querySelectorAll('.card').forEach(card => {
-    const status = card.getAttribute('data-status'); // Supposons que le statut soit défini dans un attribut 'data-status'
-    
-    if (status === 'validée') {
-        card.classList.add('validée');
-    } else if (status === 'en_attente') {
-        card.classList.add('en_attente');
-    } else if (status === 'refusée') {
-        card.classList.add('refusée');
-    }
-});
-     </script>
+
+        document.querySelectorAll('.card').forEach(card => {
+            const status = card.getAttribute('data-status'); // Supposons que le statut soit défini dans un attribut 'data-status'
+            
+            if (status === 'validée') {
+                card.classList.add('validée');
+            } else if (status === 'en_attente') {
+                card.classList.add('en_attente');
+            } else if (status === 'refusée') {
+                card.classList.add('refusée');
+            }
+        });
+    </script>
 </body>
 </html>

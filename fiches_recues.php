@@ -11,6 +11,9 @@ if (!isset($_SESSION['user_id'])) {
 // Récupérer les fiches reçues
 $query = "SELECT f.*, d.nom AS departement_name FROM fiches f JOIN departements d ON f.departement_id = d.id WHERE f.statut = 'en_attente'";
 $result = mysqli_query($conn, $query);
+$fichesParDepartement = [];
+while ($row = mysqli_fetch_assoc($result)) {
+$fichesParDepartement[$row['departement_name']][] = $row;}
 ?>
 
 <!DOCTYPE html>
@@ -73,9 +76,12 @@ $result = mysqli_query($conn, $query);
             </div>
 
             <div class="card-container">
-                <?php while ($row = mysqli_fetch_assoc($result)) {
+            <?php foreach ($fichesParDepartement as $departement => $fiches): ?>
+                <h2><?= htmlspecialchars($departement); ?></h2>
+                <?php foreach ($fiches as $row): // Use foreach to iterate over fiches ?>
+                    <?php 
                     $totalTP = ($row['hours_cm'] * 2.16) + ($row['hours_td'] * 1.37);
-                ?>
+                    ?>
                     <div class="card" data-status="<?= htmlspecialchars($row['statut']); ?>">
                         <h3><?= htmlspecialchars($row['nom_ec']); ?></h3>
                         <p><strong>Département:</strong> <?= htmlspecialchars($row['departement_name']); ?></p>
@@ -93,8 +99,8 @@ $result = mysqli_query($conn, $query);
                             <?php } ?>
                         </div>
                     </div>
-
-                <?php } ?>
+                <?php endforeach; // End foreach for fiches ?>
+            <?php endforeach; // End foreach for departements ?>
             </div>
         </main>
         <!-- END MAIN CONTENT -->

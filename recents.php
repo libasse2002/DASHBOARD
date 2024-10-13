@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "passer123";
-$dbname = "polytechD";
+$dbname = "polytechD1";
 $dbport = 3308;
 
 // Connexion à la base de données

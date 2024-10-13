@@ -1,7 +1,7 @@
 <?php
 // Connexion à la base de données
 $host = 'localhost';
-$db = 'polytechD';
+$db = 'polytechD1';
 $user = 'root';
 $pass = 'passer123';
 $port = 3308;

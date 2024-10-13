@@ -9,8 +9,23 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $userId = $_SESSION['user_id'];
-$query = "SELECT f.*, d.nom AS departement_name FROM fiches f JOIN departements d ON f.departement_id = d.id WHERE f.utilisateur_id = $userId";
+
+// Requête mise à jour pour inclure le niveau et le semestre
+$query = "
+    SELECT f.*, d.nom AS departement_name, n.nom AS niveau_name, s.nom AS semestre_name
+    FROM fiches f 
+    JOIN departements d ON f.departement_id = d.id 
+    LEFT JOIN niveaux n ON f.niveau_id = n.id 
+    LEFT JOIN semestres s ON f.semestre_id = s.id 
+    WHERE f.utilisateur_id = $userId
+";
 $result = mysqli_query($conn, $query);
+
+// Regroupement des fiches par département
+$fichesParDepartement = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $fichesParDepartement[$row['departement_name']][] = $row;
+}
 ?>
 
 <!DOCTYPE html>
@@ -71,24 +86,29 @@ $result = mysqli_query($conn, $query);
             </div>
 
             <div class="card-container">
-                <?php while ($row = mysqli_fetch_assoc($result)) {
-                    $totalTP = ($row['hours_cm'] * 2.16) + ($row['hours_td'] * 1.37);
-                ?>
-                    <div class="card" data-status="<?= htmlspecialchars($row['statut']); ?>">
-                        <h3><?= htmlspecialchars($row['nom_ec']); ?></h3>
-                        <p><strong>Département:</strong> <?= htmlspecialchars($row['departement_name']); ?></p>
-                        <p><strong>Heures CM:</strong> <?= htmlspecialchars($row['hours_cm']); ?></p>
-                        <p><strong>Heures TD:</strong> <?= htmlspecialchars($row['hours_td']); ?></p>
-                        <p><strong>Heures TP:</strong> <?= htmlspecialchars($row['hours_tp']); ?></p>
-                        <p><strong>Heures Totales TP:</strong> <?= number_format($totalTP, 2); ?></p>
-                        <p><strong>Date:</strong> <?= htmlspecialchars($row['date']); ?></p>
-                        <p><strong>Statut:</strong> <?= htmlspecialchars($row['statut']); ?></p>
-                        
-                        <?php if ($row['statut'] == 'en_attente' || $row['statut'] == 'refusée') { ?>
-                            <a href="modifier_fiche.php?id=<?= $row['id']; ?>" class="modify-button">Modifier</a>
-                        <?php } ?>
-                    </div>
-                <?php } ?>
+                <?php foreach ($fichesParDepartement as $departement => $fiches): ?>
+                    <h2><?= htmlspecialchars($departement); ?></h2>
+                    <?php foreach ($fiches as $row): 
+                        $totalTP = ($row['hours_cm'] * 2.16) + ($row['hours_td'] * 1.37);
+                    ?>
+                        <div class="card" data-status="<?= htmlspecialchars($row['statut']); ?>">
+                            <h3><?= htmlspecialchars($row['nom_ec']); ?></h3>
+                            <p><strong>Département:</strong> <?= htmlspecialchars($row['departement_name']); ?></p>
+                            <p><strong>Niveau:</strong> <?= htmlspecialchars($row['niveau_name']); ?></p>
+                            <p><strong>Semestre:</strong> <?= htmlspecialchars($row['semestre_name']); ?></p>
+                            <p><strong>Heures CM:</strong> <?= htmlspecialchars($row['hours_cm']); ?></p>
+                            <p><strong>Heures TD:</strong> <?= htmlspecialchars($row['hours_td']); ?></p>
+                            <p><strong>Heures TP:</strong> <?= htmlspecialchars($row['hours_tp']); ?></p>
+                            <p><strong>Heures Totales TP:</strong> <?= number_format($totalTP, 2); ?></p>
+                            <p><strong>Date:</strong> <?= htmlspecialchars($row['date']); ?></p>
+                            <p><strong>Statut:</strong> <?= htmlspecialchars($row['statut']); ?></p>
+                            
+                            <?php if ($row['statut'] == 'en_attente' || $row['statut'] == 'refusée') { ?>
+                                <a href="modifier_fiche.php?id=<?= $row['id']; ?>" class="modify-button">Modifier</a>
+                            <?php } ?>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endforeach; ?>
             </div>
         </main>
         <!-- END MAIN CONTENT -->
