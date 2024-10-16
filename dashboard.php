@@ -14,6 +14,14 @@ $query = "SELECT * FROM utilisateur2 WHERE id = '$user_id'";
 $result = mysqli_query($conn, $query);
 $user = mysqli_fetch_assoc($result);
 
+// Vérifiez si l'utilisateur est chef de département
+$isChefDepartementQuery = $conn->prepare("SELECT COUNT(*) FROM chef_departement WHERE utilisateur_id = ?");
+$isChefDepartementQuery->bind_param("i", $user_id);
+$isChefDepartementQuery->execute();
+$isChefDepartementResult = $isChefDepartementQuery->get_result();
+$isChefDepartement = $isChefDepartementResult->fetch_row()[0] > 0;
+$isChefDepartementQuery->close();
+
 // Récupérer les statistiques des fiches
 $pending_query = "SELECT COUNT(*) AS count FROM fiches WHERE statut = 'en_attente' AND utilisateur_id = '$user_id'";
 $approved_query = "SELECT COUNT(*) AS count FROM fiches WHERE statut = 'validée' AND utilisateur_id = '$user_id'";
@@ -28,12 +36,17 @@ if ($pending_result && $approved_result && $rejected_result) {
     $approved_count = mysqli_fetch_assoc($approved_result)['count'];
     $rejected_count = mysqli_fetch_assoc($rejected_result)['count'];
 } else {
-    // Gérer l'erreur si une des requêtes échoue
     echo 'Erreur lors de la récupération des données : ' . mysqli_error($conn);
 }
 
-// Récupérer les déclarations récentes
-$recent_declarations_query = "SELECT * FROM fiches WHERE utilisateur_id = '$user_id' ORDER BY date DESC LIMIT 5";
+// Récupérer les déclarations récentes avec le nom de l'EC
+$recent_declarations_query = "
+    SELECT fiches.*, ec.nom_ec 
+    FROM fiches 
+    JOIN ec ON fiches.ec_id = ec.id
+    WHERE fiches.utilisateur_id = '$user_id' 
+    ORDER BY fiches.date DESC 
+    LIMIT 5";
 $recent_declarations_result = mysqli_query($conn, $recent_declarations_query);
 ?>
 
@@ -52,13 +65,15 @@ $recent_declarations_result = mysqli_query($conn, $recent_declarations_query);
     <!-- SIDEBAR -->
     <section id="sidebar">
         <a href="#" class="brand">
-             <img src="UAM1.png" id="uam" alt="">
+            <img src="UAM1.png" id="uam" alt="">
             <span class="text">Polytech Diamniadio</span>
         </a>
         <ul class="side-menu top">
-            <li class="active"><a href="dashboard.php"><i class='bx bxs-home bx-tada' ></i><span>Accueil</span></a></li>
+            <li class="active"><a href="dashboard.php"><i class='bx bxs-home bx-tada'></i><span>Accueil</span></a></li>
             <li><a href="mes_fiches.php"><i class='bx bxs-collection bx-tada'></i><span>Mes Fiches</span></a></li>
-            <li><a href="fiches_recues.php"><i class='bx bxs-file-import bx-tada'></i><span>Fiches Reçues</span></a></li>
+            <?php if ($isChefDepartement): ?>
+                <li><a href="fiches_recues.php"><i class='bx bxs-file-import bx-tada'></i><span>Fiches Reçues</span></a></li>
+            <?php endif; ?>
             <li><a href="fiches_validées.php"><i class='bx bxs-select-multiple bx-tada'></i><span>Fiches Validées</span></a></li>
             <li><a href="nouvelle_soumission.php"><i class='bx bxs-file-export bx-tada'></i><span>Nouvelle Soumission</span></a></li>
         </ul>
@@ -111,11 +126,11 @@ $recent_declarations_result = mysqli_query($conn, $recent_declarations_query);
             </div>
 
             <div class="recent-declarations">
-                <h3>Déclarations Récentes</h3>
+                <h3><?php echo $isChefDepartement ? 'Fiches Récentes' : 'Déclarations Récentes'; ?></h3>
                 <table>
                     <thead>
                         <tr>
-                            <th>Départements</th>
+                            <th>Unité d'Enseignement (EC)</th>
                             <th>Date</th>
                             <th>Statut</th>
                         </tr>

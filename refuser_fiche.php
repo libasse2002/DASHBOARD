@@ -2,49 +2,49 @@
 include 'db_connect.php';
 session_start();
 
-try {
-    // Vérifier si l'utilisateur est connecté
-    if (!isset($_SESSION['user_id'])) {
-        throw new Exception("Utilisateur non connecté.");
-    }
-
-    // Récupérer l'ID de la fiche à refuser
-    if (!isset($_POST['fiche_id']) || !filter_var($_POST['fiche_id'], FILTER_VALIDATE_INT)) {
-        throw new Exception("ID de fiche non spécifié ou invalide.");
-    }
-
-    $ficheId = intval($_POST['fiche_id']);
-    $userId = $_SESSION['user_id'];
-
-    // Vérifier si la fiche existe et appartient à l'utilisateur
-    $checkFiche = $conn->prepare("SELECT * FROM fiches WHERE id = ? AND utilisateur_id = ?");
-    $checkFiche->bind_param("ii", $ficheId, $userId);
-    $checkFiche->execute();
-    $result = $checkFiche->get_result();
-
-    if ($result->num_rows === 0) {
-        throw new Exception("Fiche non trouvée ou vous n'avez pas les autorisations nécessaires.");
-    }
-
-    $checkFiche->close();
-
-    // Mettre à jour le statut de la fiche à 'refusée'
-    $query = "UPDATE fiches SET statut = 'refusée' WHERE id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $ficheId);
-
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'La fiche a été refusée avec succès.']);
-    } else {
-        throw new Exception("Erreur lors de la mise à jour du statut de la fiche.");
-    }
-
-    $stmt->close();
-} catch (Exception $e) {
-    http_response_code(400); // Envoie un code d'état HTTP 400 pour les erreurs
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+if (!isset($_SESSION['user_id'])) {
+    header('Location: log.php');
+    exit();
 }
 
-// Fermer la connexion à la base de données
-$conn->close();
+// Récupérer l'ID de l'utilisateur connecté
+$userId = $_SESSION['user_id'];
+
+// Récupérer l'ID du département du chef de département
+$queryChefDepartement = "SELECT departement_id FROM chef_departement WHERE utilisateur_id = ?";
+$stmt = $conn->prepare($queryChefDepartement);
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$resultChef = $stmt->get_result();
+
+if ($resultChef->num_rows === 0) {
+    die("Vous n'êtes pas un chef de département ou votre département n'est pas défini.");
+}
+
+$departementRow = $resultChef->fetch_assoc();
+$departementId = $departementRow['departement_id'];
+
+// Vérifier si une fiche a été soumise
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['fiche_id'])) {
+    $ficheId = $_POST['fiche_id'];
+
+    // Mettre à jour le statut de la fiche à "refusée"
+    $queryUpdate = "UPDATE fiches SET statut = 'refusée' WHERE id = ?";
+    $stmt = $conn->prepare($queryUpdate);
+    $stmt->bind_param("i", $ficheId);
+    
+    if ($stmt->execute()) {
+        $response = [
+            'status' => 'success',
+            'message' => 'Fiche refusée avec succès.'
+        ];
+    } else {
+        $response = [
+            'status' => 'error',
+            'message' => 'Une erreur s\'est produite lors du refus de la fiche.'
+        ];
+    }
+    echo json_encode($response);
+    exit();
+}
 ?>

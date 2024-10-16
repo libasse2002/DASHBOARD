@@ -10,13 +10,23 @@ if (!isset($_SESSION['user_id'])) {
 
 $userId = $_SESSION['user_id'];
 
-// Requête mise à jour pour inclure le niveau et le semestre
+// Vérifiez si l'utilisateur est un chef de département
+$isChefDepartementQuery = $conn->prepare("SELECT COUNT(*) FROM chef_departement WHERE utilisateur_id = ?");
+$isChefDepartementQuery->bind_param("i", $userId);
+$isChefDepartementQuery->execute();
+$isChefDepartementResult = $isChefDepartementQuery->get_result();
+$isChefDepartement = $isChefDepartementResult->fetch_row()[0] > 0;
+$isChefDepartementQuery->close();
+
+// Requête mise à jour pour inclure le niveau, le semestre, l'EC et la filière
 $query = "
-    SELECT f.*, d.nom AS departement_name, n.nom AS niveau_name, s.nom AS semestre_name
+    SELECT f.*, d.nom AS departement_name, n.nom AS niveau_name, s.nom AS semestre_name, e.nom_ec, fi.nom AS filiere_name
     FROM fiches f 
     JOIN departements d ON f.departement_id = d.id 
     LEFT JOIN niveaux n ON f.niveau_id = n.id 
     LEFT JOIN semestres s ON f.semestre_id = s.id 
+    LEFT JOIN ec e ON f.ec_id = e.id
+    LEFT JOIN filieres fi ON f.filiere_id = fi.id 
     WHERE f.utilisateur_id = $userId
 ";
 $result = mysqli_query($conn, $query);
@@ -45,9 +55,11 @@ while ($row = mysqli_fetch_assoc($result)) {
             <span class="text">Polytech Diamniadio</span>
         </a>
         <ul class="side-menu top">
-            <li><a href="dashboard.php"><i class='bx bxs-home bx-tada' ></i><span>Accueil</span></a></li>
+            <li><a href="dashboard.php"><i class='bx bxs-home bx-tada'></i><span>Accueil</span></a></li>
             <li class="active"><a href="mes_fiches.php"><i class='bx bxs-collection bx-tada'></i><span>Mes Fiches</span></a></li>
-            <li><a href="fiches_recues.php"><i class='bx bxs-file-import bx-tada'></i><span>Fiches Reçues</span></a></li>
+            <?php if ($isChefDepartement): ?>
+                <li><a href="fiches_recues.php"><i class='bx bxs-file-import bx-tada'></i><span>Fiches Reçues</span></a></li>
+            <?php endif; ?>
             <li><a href="fiches_validées.php"><i class='bx bxs-select-multiple bx-tada'></i><span>Fiches Validées</span></a></li>
             <li><a href="nouvelle_soumission.php"><i class='bx bxs-file-export bx-tada'></i><span>Nouvelle Soumission</span></a></li>
         </ul>
@@ -92,10 +104,11 @@ while ($row = mysqli_fetch_assoc($result)) {
                         $totalTP = ($row['hours_cm'] * 2.16) + ($row['hours_td'] * 1.37);
                     ?>
                         <div class="card" data-status="<?= htmlspecialchars($row['statut']); ?>">
-                            <h3><?= htmlspecialchars($row['nom_ec']); ?></h3>
+                            <h3><?= htmlspecialchars($row['filiere_name']); ?></h3>
                             <p><strong>Département:</strong> <?= htmlspecialchars($row['departement_name']); ?></p>
                             <p><strong>Niveau:</strong> <?= htmlspecialchars($row['niveau_name']); ?></p>
                             <p><strong>Semestre:</strong> <?= htmlspecialchars($row['semestre_name']); ?></p>
+                            <p><strong>EC:</strong> <?= htmlspecialchars($row['nom_ec']); ?></p>
                             <p><strong>Heures CM:</strong> <?= htmlspecialchars($row['hours_cm']); ?></p>
                             <p><strong>Heures TD:</strong> <?= htmlspecialchars($row['hours_td']); ?></p>
                             <p><strong>Heures TP:</strong> <?= htmlspecialchars($row['hours_tp']); ?></p>

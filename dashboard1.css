@@ -32,6 +32,8 @@ li {
     --light-green: #d7ffd3;
     --green: #25e314;
     --beige: #A0522D;
+	--white: #ffffff;
+	--black: #000000;
 }
 
 html {

@@ -26,17 +26,31 @@ try {
 
     $userId = $_SESSION['user_id'];
 
-    // Vérifiez si la fiche existe et appartient à l'utilisateur
-    $checkFiche = $conn->prepare("SELECT * FROM fiches WHERE id = ? AND utilisateur_id = ?");
-    $checkFiche->bind_param("ii", $ficheId, $userId);
+    // Vérifiez si l'utilisateur est chef de département
+    $isChefDepartementQuery = $conn->prepare("SELECT COUNT(*) FROM chef_departement WHERE utilisateur_id = ?");
+    $isChefDepartementQuery->bind_param("i", $userId);
+    $isChefDepartementQuery->execute();
+    $isChefDepartementResult = $isChefDepartementQuery->get_result();
+    $isChefDepartement = $isChefDepartementResult->fetch_row()[0] > 0;
+    $isChefDepartementQuery->close();
+
+    // Vérifiez si la fiche existe
+    $checkFiche = $conn->prepare("SELECT * FROM fiches WHERE id = ?");
+    $checkFiche->bind_param("i", $ficheId);
     $checkFiche->execute();
     $result = $checkFiche->get_result();
 
     if ($result->num_rows === 0) {
-        throw new Exception("Fiche non trouvée ou vous n'avez pas les autorisations nécessaires.");
+        throw new Exception("Fiche non trouvée.");
     }
 
+    $fiche = $result->fetch_assoc();
     $checkFiche->close();
+
+    // Si l'utilisateur n'est pas chef de département, il ne peut pas changer le statut
+    if (!$isChefDepartement) {
+        throw new Exception("Vous n'avez pas les autorisations nécessaires pour valider cette fiche.");
+    }
 
     // Mettre à jour le statut de la fiche
     $query = "UPDATE fiches SET statut = ? WHERE id = ?";

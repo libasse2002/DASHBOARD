@@ -2,31 +2,54 @@
 include 'db_connect.php';
 session_start();
 
+// Vérifiez si l'utilisateur est connecté
 if (!isset($_SESSION['user_id'])) {
-    die(json_encode(['success' => false, 'message' => "Utilisateur non connecté."]));
+    header('Location: log.php'); // Redirige vers la page de connexion si non connecté
+    exit();
 }
 
-// Récupérer et valider les données du formulaire
-$ficheId = filter_input(INPUT_POST, 'fiche_id', FILTER_VALIDATE_INT);
-$nomEc = filter_input(INPUT_POST, 'nomEc', FILTER_SANITIZE_STRING);
-$hoursCM = filter_input(INPUT_POST, 'hoursCM', FILTER_VALIDATE_FLOAT);
-$hoursTD = filter_input(INPUT_POST, 'hoursTD', FILTER_VALIDATE_FLOAT);
-$hoursTP = filter_input(INPUT_POST, 'hoursTP', FILTER_VALIDATE_FLOAT);
-$date = filter_input(INPUT_POST, 'date', FILTER_SANITIZE_STRING);
-$signature = filter_input(INPUT_POST, 'signature', FILTER_SANITIZE_STRING);
+$userId = $_SESSION['user_id'];
 
-if (!$ficheId || !$nomEc || !$hoursCM || !$hoursTD || !$hoursTP || !$date || !$signature) {
-    die(json_encode(['success' => false, 'message' => "Données invalides."]));
+// Récupérer l'ID de la fiche à modifier
+$ficheId = isset($_POST['fiche_id']) ? intval($_POST['fiche_id']) : 0;
+
+if ($ficheId === 0) {
+    header('Location: mes_fiches.php'); // Redirige si aucun ID n'est fourni
+    exit();
 }
 
-// Mettre à jour la fiche
-$query = "UPDATE fiches SET nom_ec = ?, hours_cm = ?, hours_td = ?, hours_tp = ?, date = ?, signature = ? WHERE id = ? AND utilisateur_id = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("sdddssii", $nomEc, $hoursCM, $hoursTD, $hoursTP, $date, $signature, $ficheId, $_SESSION['user_id']);
+// Récupérer les informations envoyées par le formulaire
+$departmentId = isset($_POST['department']) ? intval($_POST['department']) : 0;
+$filiereId = isset($_POST['filiere']) ? intval($_POST['filiere']) : 0;
+$niveauId = isset($_POST['niveau']) ? intval($_POST['niveau']) : 0;
+$semestreId = isset($_POST['semestre']) ? intval($_POST['semestre']) : 0;
+$ecId = isset($_POST['ec']) ? intval($_POST['ec']) : 0;
+$hoursCM = isset($_POST['hoursCM']) ? floatval($_POST['hoursCM']) : 0;
+$hoursTD = isset($_POST['hoursTD']) ? floatval($_POST['hoursTD']) : 0;
+$hoursTP = isset($_POST['hoursTP']) ? floatval($_POST['hoursTP']) : 0;
+$signature = isset($_POST['signature']) ? htmlspecialchars($_POST['signature']) : '';
+
+// Mettre à jour la fiche dans la base de données et définir le statut à 'en attente'
+$updateQuery = "
+    UPDATE fiches 
+    SET departement_id = ?, filiere_id = ?, niveau_id = ?, semestre_id = ?, ec_id = ?, 
+        hours_cm = ?, hours_td = ?, hours_tp = ?, signature = ?, statut = 'en_attente'
+    WHERE id = ? AND utilisateur_id = ? AND (statut = 'en_attente' OR statut = 'refusée')
+";
+
+$stmt = $conn->prepare($updateQuery);
+
+// Update bind_param to match the number of variables
+$stmt->bind_param('iiiiiiddssi', $departmentId, $filiereId, $niveauId, $semestreId, $ecId, $hoursCM, $hoursTD, $hoursTP, $signature, $ficheId, $userId);
 
 if ($stmt->execute()) {
-    header("Location: mes_fiches.php");
-    exit();
+    // Redirection après succès
+    header('Location: mes_fiches.php?message=Fiche mise à jour avec succès.');
 } else {
-    die(json_encode(['success' => false, 'message' => "Erreur de mise à jour."]));
+    // Gestion des erreurs
+    echo "Erreur lors de la mise à jour de la fiche : " . $stmt->error;
 }
+
+$stmt->close();
+$conn->close();
+?>
