@@ -22,7 +22,12 @@ $departements = $result->fetch_all(MYSQLI_ASSOC);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 </head>
 <body>
+<img class="wave" src="wave3.png">
     <div class="container">
+        <div class="img">
+            <img src="bg.svg">
+        </div>
+    <div class="container1">
         <h2 class="title">Nouvelle Soumission</h2>
         <form id="submissionForm" action="submit.php" method="POST">
             <input type="hidden" name="submit" value="1">
@@ -209,6 +214,26 @@ $departements = $result->fetch_all(MYSQLI_ASSOC);
                     alert('Erreur lors de la récupération des EC. Veuillez réessayer.');
                 });
         });
+        const inputs = document.querySelectorAll(".input");
+
+
+function addcl(){
+	let parent = this.parentNode.parentNode;
+	parent.classList.add("focus");
+}
+
+function remcl(){
+	let parent = this.parentNode.parentNode;
+	if(this.value == ""){
+		parent.classList.remove("focus");
+	}
+}
+
+
+inputs.forEach(input => {
+	input.addEventListener("focus", addcl);
+	input.addEventListener("blur", remcl);
+});
     </script>
 </body>
 </html>

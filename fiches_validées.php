@@ -140,6 +140,15 @@ while ($row = mysqli_fetch_assoc($result)) {
                 card.classList.add('refusée');
             }
         });
+        const switchMode = document.getElementById('switch-mode');
+
+switchMode.addEventListener('change', function () {
+	if(this.checked) {
+		document.body.classList.add('dark');
+	} else {
+		document.body.classList.remove('dark');
+	}
+});
     </script>
 </body>
 </html>

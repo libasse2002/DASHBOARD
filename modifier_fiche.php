@@ -50,7 +50,12 @@ $departements = $departmentsResult->fetch_all(MYSQLI_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
+<img class="wave" src="wave3.png">
     <div class="container">
+        <div class="img">
+            <img src="bg.svg">
+        </div>
+    <div class="container1">
         <h2 class="title">Modifier Fiche</h2>
         <form id="modifierForm" action="modifier_fiche_action.php" method="POST">
             <input type="hidden" name="fiche_id" value="<?= htmlspecialchars($fiche['id']); ?>">
@@ -213,6 +218,26 @@ $departements = $departmentsResult->fetch_all(MYSQLI_ASSOC);
             document.getElementById('semestre').value = '<?= htmlspecialchars($fiche['semestre_id']); ?>';
             document.getElementById('ec').value = '<?= htmlspecialchars($fiche['ec_id']); ?>';
         });
+        const inputs = document.querySelectorAll(".input");
+
+
+function addcl(){
+	let parent = this.parentNode.parentNode;
+	parent.classList.add("focus");
+}
+
+function remcl(){
+	let parent = this.parentNode.parentNode;
+	if(this.value == ""){
+		parent.classList.remove("focus");
+	}
+}
+
+
+inputs.forEach(input => {
+	input.addEventListener("focus", addcl);
+	input.addEventListener("blur", remcl);
+});
     </script>
 </body>
 </html>

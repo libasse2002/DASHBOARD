@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <img class="wave" src="wave3.png">
     <div class="container">
         <div class="img">
-            <img src="undraw_Calculator_re_alsc.png">
+            <img src="bg.svg">
         </div>
         <div class="login-content">
             <form action="" method="post">

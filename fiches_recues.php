@@ -24,7 +24,7 @@ if ($resultChef->num_rows === 0) {
 $departementRow = $resultChef->fetch_assoc();
 $departementId = $departementRow['departement_id'];
 
-// Updated query to include ec and filiere names, filtering by the chef's department
+// Requête pour récupérer les fiches
 $query = "
     SELECT f.*, d.nom AS departement_name, e.nom_ec, fi.nom AS filiere_name, u.username AS user_name 
     FROM fiches f 
@@ -34,7 +34,6 @@ $query = "
     JOIN utilisateur2 u ON f.utilisateur_id = u.id
     WHERE f.statut = 'en_attente' AND f.departement_id = ?
 ";
-
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $departementId);
 $stmt->execute();
@@ -45,8 +44,6 @@ if ($result->num_rows === 0) {
     echo "Aucune fiche trouvée.";
 } else {
     while ($row = $result->fetch_assoc()) {
-        // Affichez les données pour le débogage
-        // print_r($row); // Pour voir ce que contient $row
         $fichesParDepartement[$row['departement_name']][] = $row;
     }
 }
@@ -111,7 +108,6 @@ if ($result->num_rows === 0) {
                     <h2><?= htmlspecialchars($departement); ?></h2>
                     <?php foreach ($fiches as $row): ?>
                         <?php 
-                        // Calculer les heures totales TP
                         $totalTP = (($row['hours_cm'] ?? 0) * 2.16) + (($row['hours_td'] ?? 0) * 1.37); 
                         ?>
                         <div class="card" data-status="<?= htmlspecialchars($row['statut'] ?? ''); ?>">
@@ -199,11 +195,15 @@ if ($result->num_rows === 0) {
                 button.addEventListener('mouseenter', function() {
                     const card = button.closest('.card');
                     card.style.backgroundColor = 'var(--light-green)';
+                    const textElements = card.querySelectorAll('p, h3');
+                    textElements.forEach(text => text.style.color = 'var(--green)');
                 });
 
                 button.addEventListener('mouseleave', function() {
                     const card = button.closest('.card');
                     card.style.backgroundColor = '';
+                    const textElements = card.querySelectorAll('p, h3');
+                    textElements.forEach(text => text.style.color = 'var(--blue)');
                 });
             });
 
@@ -211,14 +211,27 @@ if ($result->num_rows === 0) {
                 button.addEventListener('mouseenter', function() {
                     const card = button.closest('.card');
                     card.style.backgroundColor = 'var(--light-red)';
+                    const textElements = card.querySelectorAll('p, h3');
+                    textElements.forEach(text => text.style.color = 'var(--red2)');
                 });
 
                 button.addEventListener('mouseleave', function() {
                     const card = button.closest('.card');
                     card.style.backgroundColor = '';
+                    const textElements = card.querySelectorAll('p, h3');
+                    textElements.forEach(text => text.style.color = 'var(--blue)');
                 });
             });
         });
+        const switchMode = document.getElementById('switch-mode');
+
+switchMode.addEventListener('change', function () {
+	if(this.checked) {
+		document.body.classList.add('dark');
+	} else {
+		document.body.classList.remove('dark');
+	}
+});
     </script>
 </body>
 </html>
