@@ -19,10 +19,21 @@ if (isset($_POST['submit'])) {
     $hoursTP = floatval($_POST['hoursTP']);
     $signature = $_POST['signature'];
 
+    // Insertion de la soumission dans la table 'fiches'
     $stmt = $conn->prepare("INSERT INTO fiches (utilisateur_id, departement_id, filiere_id, niveau_id, semestre_id, ec_id, hours_cm, hours_td, hours_tp, signature) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("iiiiidddds", $utilisateurId, $departmentId, $filiereId, $niveauId, $semestreId, $ecId, $hoursCM, $hoursTD, $hoursTP, $signature);
 
     if ($stmt->execute()) {
+        // Récupération des noms pour le message
+        $nomUtilisateur = $conn->query("SELECT nom FROM utilisateur2 WHERE id = $utilisateurId")->fetch_assoc()['nom'];
+        $prenomUtilisateur = $conn->query("SELECT prenom FROM utilisateur2 WHERE id = $utilisateurId")->fetch_assoc()['prenom'];
+        $nomDepartement = $conn->query("SELECT nom FROM departements WHERE id = $departmentId")->fetch_assoc()['nom'];
+        $nomFiliere = $conn->query("SELECT nom FROM filieres WHERE id = $filiereId")->fetch_assoc()['nom'];
+        $nomNiveau = $conn->query("SELECT nom FROM niveaux WHERE id = $niveauId")->fetch_assoc()['nom'];
+        $nomSemestre = $conn->query("SELECT nom FROM semestres WHERE id = $semestreId")->fetch_assoc()['nom'];
+        $nomEC = $conn->query("SELECT nom_ec FROM ec WHERE id = $ecId")->fetch_assoc()['nom_ec'];
+
+        // Récupération de l'email du chef de département
         $queryChef = "SELECT utilisateur_id FROM chef_departement WHERE departement_id = ?";
         $stmtChef = $conn->prepare($queryChef);
         $stmtChef->bind_param("i", $departmentId);
@@ -40,8 +51,13 @@ if (isset($_POST['submit'])) {
 
             if ($user) {
                 $to = $user['email'];
-                $subject = "Nouvelle Soumission de Chargé d'Enseignement";
-                $message = "Une nouvelle soumission a été faite pour le département : " . htmlspecialchars($departmentId) . ".\n\nDétails :\n- Filière : " . htmlspecialchars($filiereId) . "\n- Niveau : " . htmlspecialchars($niveauId) . "\n- Semestre : " . htmlspecialchars($semestreId) . "\n- EC : " . htmlspecialchars($ecId) . "\n\nVeuillez consulter le tableau de bord pour plus de détails.";
+                $subject = "Nouvelle Soumission de Charges horaires";
+                $message = "Une nouvelle soumission a été faite par : $prenomUtilisateur $nomUtilisateur.\n\nDétails :\n" .
+                           "- Département : $nomDepartement\n" .
+                           "- Filière : $nomFiliere\n" .
+                           "- Niveau : $nomNiveau\n" .
+                           "- Semestre : $nomSemestre\n" .
+                           "- EC : $nomEC\n\nVeuillez consulter le tableau de bord pour plus de détails.";
 
                 $mail = new PHPMailer(true);
                 try {
@@ -49,7 +65,7 @@ if (isset($_POST['submit'])) {
                     $mail->Host = 'smtp.gmail.com';
                     $mail->SMTPAuth = true;
                     $mail->Username = 'dia.limamoulaye@uam.edu.sn';
-                    $mail->Password = 'xx-xx-xx';
+                    $mail->Password = 'xgtk awxw rbsl ywur';
                     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                     $mail->Port = 587;
 
